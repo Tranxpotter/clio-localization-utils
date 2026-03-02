@@ -77,8 +77,51 @@ ros2 launch clio_bringup navigation.launch.py \
 ```
 
 ## Launch Arguments
+Below are the launch arguments declared in each launch file.
 
-Please go to the respective package repositories for details
+### `mapping.launch.py`
+
+| Argument | Default | Description |
+|---|---|---|
+| `driver` | `True` | Start Livox MID360 driver (`livox_ros_driver2`). |
+| `fastlio` | `True` | Start FAST-LIO mapping launch. |
+| `save_path` | `maps/scans.pcd` | Target path for saved map file (currently not actively used by shutdown copy logic). |
+| `record_bag` | `True` | Record rosbag during mapping session. |
+| `bag_path` | `rosbags/mapping` | Output path for recorded rosbag. |
+
+### `register_localization.launch.py`
+
+| Argument | Default | Description |
+|---|---|---|
+| `driver` | `True` | Start Livox MID360 driver. |
+| `fastlio` | `True` | Start FAST-LIO pipeline. |
+| `static_odom` | `True` | Start static odom publisher used to provide a fixed odometry stream/frame bridge for localization flow. |
+| `localizer` | `True` | Start localizer nodes (`localizer_node` + localizer RViz). |
+| `remapper` | `True` | Start initial pose remapper (`/initialpose` to relocalize service). |
+| `map_path` | `maps/scans.pcd` | 3D `.pcd` map path for relocalization service. |
+| `map_2d_path` | `maps/map.yaml` | 2D Nav2 map yaml path (`.yaml` + referenced `.pgm`). |
+| `use_bag` | `False` | Play rosbag inside this launch. |
+| `bag_path` | `rosbags/mapping` | Rosbag path used when `use_bag:=True`. |
+| `use_sim_time` | `False` | Enable ROS simulation clock (`/clock`). |
+
+### `navigation.launch.py`
+
+| Argument | Default | Description |
+|---|---|---|
+| `driver` | `True` | Start Livox MID360 driver. |
+| `fastlio` | `True` | Start FAST-LIO pipeline. |
+| `static_odom` | `True` | Start static odom publisher for localization/nav flow. |
+| `localizer` | `True` | Start localizer nodes (`localizer_node` + localizer RViz). |
+| `remapper` | `True` | Start initial pose remapper for relocalization trigger. |
+| `map_path` | `maps/scans.pcd` | 3D `.pcd` map path used by remapper/localizer flow. |
+| `map_2d_path` | `maps/map.yaml` | 2D Nav2 map yaml path used by Nav2 bringup. |
+| `use_sim_time` | `False` | Enable ROS simulation clock (`/clock`). |
+
+### Quick guidance
+
+- In practice, `map_path` and `map_2d_path` are the most important values to override per environment.
+- For rosbag-based runs, set `use_sim_time:=True` and make sure bag playback publishes `/clock`.
+- Disable components selectively (e.g., `driver:=False`) when running with pre-recorded data.
 
 ## Related Repositories
 

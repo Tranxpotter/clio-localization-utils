@@ -2,13 +2,16 @@
 Docstring for clio_bringup.launch.register_localization.launch.py
 
 Launch arguments: (* important)
-    driver: Whether to launch the Livox ROS Driver 2 (default: False)
+    driver: Whether to launch the Livox ROS Driver 2 (default: True)
     fastlio: Whether to launch the Fast LIO mapping node (default: True)
+    static_odom: Whether to launch static odom node to link map -> camera_init (default: True)
     localizer: Whether to launch the localizer node (default: True)
     remapper: Whether to launch the remapper node (default True)
     *map_path: Path to the saved map (default: "maps/scans.pcd")
+    *map_2d_path: Path to 2d map yaml (default: "maps/map.yaml")
     use_bag: Whether to play a ros bag (default: False)           #Usually we should play rosbag in another terminal
     bag_path: Path the saved ros bag (default: "rosbags/mapping")
+    use_sim_time: Use sim time (default: False)
 '''
 
 
@@ -37,7 +40,7 @@ def generate_launch_description():
     nav2_bringup_dir = get_package_share_directory("nav2_bringup")
 
     # Declare launch arguments
-    declare_launch_driver = DeclareLaunchArgument('driver', default_value="False")
+    declare_launch_driver = DeclareLaunchArgument('driver', default_value="True")
     declare_launch_fastlio = DeclareLaunchArgument('fastlio', default_value="True")
     declare_launch_static_odom = DeclareLaunchArgument('static_odom', default_value="True")
     declare_launch_localizer = DeclareLaunchArgument('localizer', default_value="True")

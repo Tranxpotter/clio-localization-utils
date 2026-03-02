@@ -2,13 +2,14 @@
 Docstring for clio_bringup.launch.navigation.launch.py
 
 Launch arguments: (* important)
-    driver: Whether to launch the Livox ROS Driver 2 (default: False)
+    driver: Whether to launch the Livox ROS Driver 2 (default: True)
     fastlio: Whether to launch the Fast LIO mapping node (default: True)
+    static_odom: Whether to launch static odom node to link map -> camera_init (default: True)
     localizer: Whether to launch the localizer node (default: True)
     remapper: Whether to launch the remapper node (default True)
     *map_path: Path to the saved map (default: "maps/scans.pcd")
-    use_bag: Whether to play a ros bag (default: False)           #Usually we should play rosbag in another terminal
-    bag_path: Path the saved ros bag (default: "rosbags/mapping")
+    *map_2d_path: Path to 2d map yaml (default: "maps/map.yaml")
+    use_sim_time: Use sim time (default: False)
 '''
 
 
@@ -37,15 +38,13 @@ def generate_launch_description():
     nav2_bringup_dir = get_package_share_directory("nav2_bringup")
 
     # Declare launch arguments
-    declare_launch_driver = DeclareLaunchArgument('driver', default_value="False")
+    declare_launch_driver = DeclareLaunchArgument('driver', default_value="True")
     declare_launch_fastlio = DeclareLaunchArgument('fastlio', default_value="True")
     declare_launch_static_odom = DeclareLaunchArgument('static_odom', default_value="True")
     declare_launch_localizer = DeclareLaunchArgument('localizer', default_value="True")
     declare_launch_remapper = DeclareLaunchArgument('remapper', default_value="True")
     declare_map_path = DeclareLaunchArgument('map_path', default_value="maps/scans.pcd")
     declare_map_2d_path = DeclareLaunchArgument('map_2d_path', default_value="maps/map.yaml")
-    declare_use_bag = DeclareLaunchArgument('use_bag', default_value="False")
-    declare_bag_path = DeclareLaunchArgument('bag_path', default_value="rosbags/mapping")
     declare_use_sim_time = DeclareLaunchArgument('use_sim_time', default_value="False")
 
     launch_driver = LaunchConfiguration('driver')
@@ -55,8 +54,6 @@ def generate_launch_description():
     launch_remapper = LaunchConfiguration('remapper')
     map_path = LaunchConfiguration('map_path')
     map_2d_path = LaunchConfiguration('map_2d_path')
-    use_bag = LaunchConfiguration('use_bag')
-    bag_path = LaunchConfiguration('bag_path')
     use_sim_time = LaunchConfiguration('use_sim_time')
 
     # Livox ros driver 2
@@ -72,25 +69,8 @@ def generate_launch_description():
     )
 
 
-    # pc synced static odom to link map and camera_init
-    # static_odom_node = Node(
-    #     package="guide_robot_localization", 
-    #     executable="pc_synced_static_odom_publisher", 
-    #     name="pc_synced_static_odom_publisher", 
-    #     output="screen", 
-    #     parameters=[{
-    #         "input_topic":"/cloud_registered", 
-    #         "output_topic":"/static_odom", 
-    #         "parent_frame":"/camera_init", 
-    #         "child_frame":"/static_odom", 
-    #         "period":0.05, 
-    #         "verbose":False, 
-    #         "use_sim_time":use_sim_time
-    #     }], 
-    #     condition=IfCondition(launch_static_odom)
-    # )
 
-    # pc synced static odom to link map and camera_init
+    # Static odom to link map and camera_init
     static_odom_node = Node(
         package="guide_robot_localization", 
         executable="static_odom_publisher", 
@@ -186,20 +166,8 @@ def generate_launch_description():
         condition=IfCondition(launch_remapper)
     )
 
-    #Densifier doesn't seem to work
-    # densifier = Node(
-    #     package="guide_robot_localization", 
-    #     executable="tf_densifier", 
-    #     name="tf_densifier", 
-    #     parameters=[{
-    #         "parent_frame":"map", 
-    #         "child_frame":"camera_init", 
-    #         "hertz":10.0, 
-    #         "verbose":True
-    #     }]
-    # )
 
-    # Seems like height remover is not what we need for the "sensor out of bounds" error
+    # Currently works pretty well, though can still think about whether there is a more elegant solution
     height_remover = Node(
         package="guide_robot_localization", 
         executable="tf_height_remover", 
@@ -212,19 +180,6 @@ def generate_launch_description():
             "z_extra_offset":0.2, 
             "use_sim_time":use_sim_time
         }]
-    )
-
-
-    # body_to_base_footprint = Node(
-    #     package='tf2_ros', executable='static_transform_publisher',
-    #     arguments=['0','0','-0.4','0','0','0', "body", "robot_footprint"]
-    # )
-
-    rosbag = ExecuteProcess(
-        cmd=['ros2', 'bag', 'play', bag_path],
-        output='screen', 
-        condition=IfCondition(use_bag), 
-        name="rosbag_recorder"
     )
 
 
@@ -266,8 +221,6 @@ def generate_launch_description():
         declare_launch_remapper, 
         declare_map_path, 
         declare_map_2d_path, 
-        declare_use_bag, 
-        declare_bag_path, 
         declare_use_sim_time, 
         driver, 
         fastlio_group, 
@@ -275,10 +228,7 @@ def generate_launch_description():
         localizer_node, 
         localizer_rviz, 
         remapper, 
-        # densifier, 
         height_remover, 
-        # body_to_base_footprint, 
-        rosbag, 
         nav2_bringup, 
         control_node
     ])

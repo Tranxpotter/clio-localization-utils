@@ -123,3 +123,4 @@ ros2 run localization_utils tf_height_remover \
 - `pose_estimate_remapper` depends on FAST-LIO localizer service interfaces (`interface/srv/Relocalize`).
 - `tf_height_remover` uses a TF buffer with 10-second cache time.
 - In integrated bringup, these nodes are typically launched by `clio_bringup` launch files rather than manually.
+- Testing

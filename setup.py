@@ -28,6 +28,7 @@ setup(
             'pose_estimate_remapper = localization_utils.pose_estimate_remapper:main', 
             'static_odom_publisher = localization_utils.static_odom_publisher:main', 
             'tf_height_remover = localization_utils.tf_height_remover:main', 
+            'pointcloud_rotator = localization_utils.pointcloud_rotator:main',
         ],
     },
 )

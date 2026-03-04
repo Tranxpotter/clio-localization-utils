@@ -69,6 +69,10 @@ class PoseEstimateRemapper(Node):
         pitch = math.asin(2 * (ow * oy - oz * ox))
         yaw = math.atan2(2 * (ow * oz + ox * oy), 1 - 2 * (oy * oy + oz * oz))
 
+        # Apply additional rotation of -60 degrees about y-axis
+        pitch += math.radians(-60.0)
+        yaw += math.radians(180.0) # No additional rotation about z-axis
+
         request = Relocalize.Request()
         request.pcd_path = self.map_path
         request.x, request.y, request.z = x, y, z

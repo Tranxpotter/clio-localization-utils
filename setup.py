@@ -24,9 +24,10 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            'global_odom_node = localization_utils.global_odom_node:main',
             'pose_estimate_remapper = localization_utils.pose_estimate_remapper:main', 
-            'static_odom_publisher = localization_utils.static_odom_publisher:main', 
-            'sensor_frame_corrector = localization_utils.sensor_frame_corrector:main'
+            'sensor_frame_corrector = localization_utils.sensor_frame_corrector:main',
+            'static_odom_publisher = localization_utils.static_odom_publisher:main',
         ],
     },
 )
